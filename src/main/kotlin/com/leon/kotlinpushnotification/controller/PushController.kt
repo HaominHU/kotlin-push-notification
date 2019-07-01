@@ -1,5 +1,7 @@
 package com.leon.kotlinpushnotification.controller
 
+import com.leon.kotlinpushnotification.model.Notifications
+import com.leon.kotlinpushnotification.repository.NotificationsRepository
 import com.leon.kotlinpushnotification.service.PushService
 import org.json.JSONObject
 import org.springframework.http.HttpEntity
@@ -11,7 +13,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 
 @RestController
-class PushController(private val pushService: PushService) {
+class PushController(private val pushService: PushService, private val notificationsRepository: NotificationsRepository) {
     private final val topic = "kotlin"
 
     @GetMapping("/send", produces = ["application/json"])
@@ -37,6 +39,8 @@ class PushController(private val pushService: PushService) {
 
         try {
             val response = push.get()
+            var n = Notifications()
+            n = notificationsRepository.saveAndFlush(n)
             return ResponseEntity(response, HttpStatus.OK)
         } catch (e: InterruptedException) {
             e.printStackTrace()
